@@ -24,7 +24,7 @@ tar -xvf contriever_msmarco_index.tar.gz
 export OPENAI = <your key>
 ```
 
-4. Run `hyde-dl19.ipynb`, it will run the experiment on the TREC DL19 dataset.
+4. Run `hyde-dl19.ipynb`, it will run the experiment on the TREC DL19 dataset. Run `hyde-demo.ipynb`, it will go through HyDE pipeline with an example query.
 
 
 ## Citation
