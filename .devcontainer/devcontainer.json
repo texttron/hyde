@@ -1,0 +1,76 @@
+{
+    // The name of the development container or project.
+    "name": "HyDE Development",
+    // The base image to be used for the dev container.
+    // In this case, it's a Python 3.9 image.
+    "image": "mcr.microsoft.com/devcontainers/python:3.9",
+    // Features to be included in the dev container.
+    "features": {
+        // Feature to include common utilities.
+        "ghcr.io/devcontainers/features/common-utils:1": {},
+        // Feature to ensure Python 3.9 is available in the container.
+        "ghcr.io/devcontainers/features/python:1": {
+            "version": "3.9"
+        },
+        // Feature to install OpenJDK (Java Development Kit).
+        "ghcr.io/devcontainers/features/java:1": {
+            "version": "17", // You can also specify other versions like "11" if needed.
+            "installGradle": false,
+            "installMaven": false
+        }
+    },
+    // Customizations for the Visual Studio Code environment.
+    "customizations": {
+        "vscode": {
+            // List of VS Code extensions to be installed automatically.
+            "extensions": [
+                "ms-python.python", // Extension for Python development.
+                "ms-toolsai.jupyter" // Extension for Jupyter support.
+            ]
+        }
+    },
+    // Ports to be forwarded from the container to the host machine.
+    "forwardPorts": [
+        8888 // Forward port for Jupyter Notebook.
+    ],
+    // Command to run after the container is created.
+    // This command installs JupyterLab and starts it in the background.
+    "postCreateCommand": "bash /workspace/setup.sh",
+    // Command that is run when the container starts
+    "postStartCommand": "bash /workspace/start.sh",
+    // Custom labels for the forwarded ports.
+    "portsAttributes": {
+        "8888": {
+            "label": "Jupyter Notebook",
+            "onAutoForward": "notify"
+        }
+    },
+    // Environmental variables for the container.
+    "remoteEnv": {
+        "PYTHONUNBUFFERED": "1",
+        "PYTHONWARNINGS": "ignore"
+    },
+    // Path settings for the Python interpreter.
+    "settings": {
+        "python.pythonPath": "/usr/local/bin/python"
+    },
+    // File system mounts between the local machine and the container.
+    "mounts": [
+        "source=${localWorkspaceFolder},target=/workspace,type=bind"
+    ],
+    // The workspace folder inside the container.
+    "workspaceFolder": "/workspace",
+    // Additional arguments to be passed to the container.
+    "runArgs": [
+        "--cap-add=SYS_PTRACE",
+        "--security-opt",
+        "seccomp=unconfined",
+        "--name",
+        "HyDE-development"
+    ],
+    // The user to be used for the remote connection.
+    "remoteUser": "vscode",
+    "hostRequirements": {
+        "memory": "8gb" // The dev container requires at least 4 GB of memory.
+    }
+}
