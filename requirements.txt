@@ -1,0 +1,7 @@
+cohere
+openai==0.28
+pyserini
+faiss-cpu
+transformers
+pyserini
+torch
