@@ -12,7 +12,7 @@ class Generator:
 
 
 class OpenAIGenerator(Generator):
-    def __init__(self, model_name, api_key, n=8, max_tokens=512, temperature=0.7, top_p=1, frequency_penalty=0.0, presence_penalty=0.0, stop=['\n\n\n'], wait_till_success=False):
+    def __init__(self, model_name, api_key, base_url=None, n=8, max_tokens=512, temperature=0.7, top_p=1, frequency_penalty=0.0, presence_penalty=0.0, stop=['\n\n\n'], wait_till_success=False):
         super().__init__(model_name, api_key)
         self.n = n
         self.max_tokens = max_tokens
@@ -22,6 +22,8 @@ class OpenAIGenerator(Generator):
         self.presence_penalty = presence_penalty
         self.stop = stop
         self.wait_till_success = wait_till_success
+        self._client_init()
+        self.base_url = base_url
     
     @staticmethod
     def parse_response(response):
@@ -32,23 +34,29 @@ class OpenAIGenerator(Generator):
             to_return.append((text, logprob))
         texts = [r[0] for r in sorted(to_return, key=lambda tup: tup[1], reverse=True)]
         return texts
+    
+    def _client_init(self):
+        self.client = openai.OpenAI(
+            base_url=self.base_url,
+            api_key=self.api_key,
+        )
+        self.client
 
     def generate(self, prompt):
         get_results = False
         while not get_results:
             try:
-                result = openai.Completion.create(
-                    engine=self.model_name,
-                    prompt=prompt,
-                    api_key=self.api_key,
-                    max_tokens=self.max_tokens,
+                result = self.client.chat.completions.create(
+                    messages=[{"role":"user", "content": prompt}]
+                    model=self.model_name,
+                    max_completion_tokens=self.max_tokens,
                     temperature=self.temperature,
                     frequency_penalty=self.frequency_penalty,
                     presence_penalty=self.presence_penalty,
                     top_p=self.top_p,
-                    n=self.n,
+                    n=self.n, # some models only support n=1
                     stop=self.stop,
-                    logprobs=1
+                    logprobs=1 # some models are not compatible with this setting
                 )
                 get_results = True
             except Exception as e:
